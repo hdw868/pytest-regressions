@@ -11,6 +11,12 @@ def test_example(data_regression):
     data_regression.check(contents)
 
 
+def test_ignores(data_regression):
+    """Basic example"""
+    contents = {"contents": "Foo", "value": 11, "instance": {"creationTime": 21312}}
+    data_regression.check(contents, ignores=['value', 'creationTime'])
+
+
 def test_basename(data_regression):
     """Basic example using basename parameter"""
     contents = {"contents": "Foo", "value": 11}

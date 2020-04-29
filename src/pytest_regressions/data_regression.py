@@ -5,6 +5,19 @@ import yaml
 from pytest_regressions.common import Path, check_text_files, perform_regression_check
 
 
+def delete_keys_from_dict(origin, keys):
+    for k in keys:
+        try:
+            del origin[k]
+        except KeyError:
+            pass
+    for v in origin.values():
+        if isinstance(v, dict):
+            delete_keys_from_dict(v, keys)
+
+    return origin
+
+
 class DataRegressionFixture:
     """
     Implementation of `data_regression` fixture.
@@ -21,7 +34,7 @@ class DataRegressionFixture:
         self.original_datadir = original_datadir
         self.force_regen = False
 
-    def check(self, data_dict, basename=None, fullpath=None):
+    def check(self, data_dict, basename=None, fullpath=None, ignores=None):
         """
         Checks the given dict against a previously recorded version, or generate a new file.
 
@@ -38,6 +51,9 @@ class DataRegressionFixture:
         ``basename`` and ``fullpath`` are exclusive.
         """
         __tracebackhide__ = True
+
+        if ignores:
+            data_dict = delete_keys_from_dict(data_dict, ignores)
 
         def dump(filename):
             """Dump dict contents to the given filename"""
